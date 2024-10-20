@@ -24,8 +24,8 @@ This application provides an interactive interface to analyze your bank statemen
    Navigate to your desired directory and clone the repository:
 
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/JaviMaligno/account_analysis.git
+   cd account_analysis
    ```
 
 2. **Build and Run the Docker Container**
@@ -127,4 +127,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Acknowledgments
 
 - Appreciation to the developers and contributors of Streamlit, Pandas, Matplotlib, and NumPy for providing the tools utilized in this application.
-

@@ -10,7 +10,7 @@ from bidict import bidict
 #TODO add more plots and data about expenses
 #TODO Grab data from database. Upload the csv to the database. 
 periods = bidict({'D': 'Daily', 'W': 'Weekly', 'M': 'Monthly', 'Q': 'Quarterly', 'Y': 'Yearly'})
-period_name = bidict({'D': 'Day', 'W': 'Week', 'M': 'Month', 'Q': 'Quarter', 'Y': 'Year'})
+period_names = bidict({'D': 'Day', 'W': 'Week', 'M': 'Month', 'Q': 'Quarter', 'Y': 'Year'})
 
 # Function to load and process the uploaded CSV files
 def load_data(uploaded_files):
@@ -192,8 +192,8 @@ if uploaded_files:
         adjusted_percentage_change = calculate_percentage_changes(adjusted_periodic_balance)
 
         # Plot end-of-period balances
-        st.subheader(f"End-of-{period_name} Balance Evolution")
-        plot_data(filtered_periodic_balance, adjusted_periodic_balance, f"End-of-{period_name} Balance", "Balance (GBP)", show_income=show_income, show_adjusted=show_adjusted)
+        st.subheader(f"End-of-{period_names[period]} Balance Evolution")
+        plot_data(filtered_periodic_balance, adjusted_periodic_balance, f"End-of-{period_names[period]} Balance", "Balance (GBP)", show_income=show_income, show_adjusted=show_adjusted)
 
         # Plot net changes
         st.subheader("Net Change")
@@ -201,14 +201,14 @@ if uploaded_files:
 
         # Plot cumulative net changes
         st.subheader("Cumulative Net Change")
-        plot_data(filtered_cumulative_net_changes, adjusted_cumulative_net_changes, "Cumulative Net Change in Balance", "Cumulative Net Change (GBP)", show_income=show_income, show_adjusted=show_adjusted)
+        plot_data(filtered_cumulative_net_changes, adjusted_cumulative_net_changes, f"Cumulative Net Change in {period_names[period]}", f"Cumulative Net Change ({period_names[period]})", show_income=show_income, show_adjusted=show_adjusted)
 
         # Plot percentage changes
         st.subheader("Percentage Change")
         plot_data(filtered_percentage_change, adjusted_percentage_change, "Month-over-Month Percentage Change", "Percentage Change (%)", income_lable='Percentage Change', adjusted_lable='Adjusted Percentage Change', show_income=show_income, show_adjusted=show_adjusted)
 
         # Plot histogram of income and expenses
-        st.subheader("Periodic Income and Expenses")
+        st.subheader(f"{period_name} Income and Expenses")
         plot_histogram(periodic_income_expenses, adjusted_income_expenses, period=period,
                        adjusted=show_adjusted, expenses=show_expenses, income=show_income)
 

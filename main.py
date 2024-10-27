@@ -17,6 +17,9 @@ def load_data(uploaded_files):
     combined_data = pd.concat([pd.read_csv(file) for file in uploaded_files], ignore_index=True)
     combined_data['Date'] = pd.to_datetime(combined_data['Date'], format='%d-%m-%Y')
     combined_data = combined_data.sort_values(by='Date')
+    # Ensure Currency column exists, default to 'GBP' if missing
+    if 'Currency' not in combined_data.columns:
+        combined_data['Currency'] = 'GBP'
     return combined_data
 
 # New utility functions
@@ -148,6 +151,8 @@ show_data_tables = st.sidebar.checkbox("Show Data Tables", value=False)
 # If both files are uploaded
 if uploaded_files:
     combined_data = load_data(uploaded_files)
+    
+
     # Sidebar for user inputs
     st.sidebar.header('Filter Options')
     period_name = st.sidebar.selectbox("Period", list(periods.values()), index=2)
@@ -156,11 +161,17 @@ if uploaded_files:
     start_date = st.sidebar.date_input('Start Date', combined_data['Date'].min())
     end_date = st.sidebar.date_input('End Date', combined_data['Date'].max())
     # Filter data based on user inputs
-    mask = (
+    date_mask = (
         (combined_data['Date'] >= pd.to_datetime(start_date)) &
         (combined_data['Date'] <= pd.to_datetime(end_date)) # & other filters
     )
-    filtered_df = combined_data.loc[mask]
+     # Get available currencies and add currency selector
+    available_currencies = combined_data['Currency'].unique()
+    selected_currency = st.sidebar.selectbox("Select Currency", available_currencies)
+    
+    # Filter data for selected currency
+    currency_mask = combined_data['Currency'] == selected_currency
+    filtered_df = combined_data.loc[date_mask & currency_mask]
 
     # Ensure start_date is before end_date
     if start_date > end_date:
@@ -193,11 +204,21 @@ if uploaded_files:
 
         # Plot end-of-period balances
         st.subheader(f"End-of-{period_names[period]} Balance Evolution")
-        plot_data(filtered_periodic_balance, adjusted_periodic_balance, f"End-of-{period_names[period]} Balance", "Balance (GBP)", show_income=show_income, show_adjusted=show_adjusted)
+        plot_data(filtered_periodic_balance, adjusted_periodic_balance, 
+                 f"End-of-{period_names[period]} Balance", 
+                 f"Balance ({selected_currency})", 
+                 show_income=show_income, 
+                 show_adjusted=show_adjusted)
 
         # Plot net changes
         st.subheader("Net Change")
-        plot_data(filtered_net_change, adjusted_net_change, "Net Change in Balance", "Net Change (GBP)", income_lable='Net Change', adjusted_lable='Adjusted Net Change', show_income=show_income, show_adjusted=show_adjusted)
+        plot_data(filtered_net_change, adjusted_net_change, 
+                 "Net Change in Balance", 
+                 f"Net Change ({selected_currency})", 
+                 income_lable='Net Change', 
+                 adjusted_lable='Adjusted Net Change', 
+                 show_income=show_income, 
+                 show_adjusted=show_adjusted)
 
         # Plot cumulative net changes
         st.subheader("Cumulative Net Change")
@@ -214,9 +235,9 @@ if uploaded_files:
 
         # Display averages
         st.subheader("Averages")
-        st.write(f"Average Net Change: {filtered_net_change.mean():.2f} GBP")
+        st.write(f"Average Net Change: {filtered_net_change.mean():.2f} {selected_currency}")
         if show_adjusted:
-            st.write(f"Average Adjusted Net Change: {adjusted_net_change.mean():.2f} GBP")
+            st.write(f"Average Adjusted Net Change: {adjusted_net_change.mean():.2f} {selected_currency}")
         st.write(f"Average Income: {periodic_income_expenses['Income'].mean():.2f} GBP")
         if show_adjusted:
             st.write(f"Average Adjusted Income: {adjusted_income_expenses['Income'].mean():.2f} GBP")

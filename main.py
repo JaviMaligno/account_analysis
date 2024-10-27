@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from bidict import bidict
 
-#TODO allow for different currencies. This may require to read the currency from the csv and convert to a common currency
-#TODO allow for different date granularity. Currently only monthly is supported.
 #TODO add options to each individual plot to show/hide data and date granularity (should be possible to clear all filters and reset to global options)
 #TODO add more plots and data about expenses
 #TODO Grab data from database. Upload the csv to the database. 
